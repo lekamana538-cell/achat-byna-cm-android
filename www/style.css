@@ -1,0 +1,119 @@
+
+/* ACHAT BYNA C&M */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #A78BFA;
+    --secondary: #C4B5FD;
+    --light: #F5F0FF;
+    --white: #FFFFFF;
+    --dark: #40345C;
+    --text: #625778;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--light);
+    color: var(--dark);
+    min-height: 100vh;
+}
+
+header {
+    background: linear-gradient(135deg, #C4B5FD, #A78BFA);
+    color: white;
+    padding: 25px 20px;
+    text-align: center;
+    border-radius: 0 0 25px 25px;
+}
+
+header h1 {
+    font-size: 25px;
+    margin-bottom: 8px;
+}
+
+header p {
+    font-size: 13px;
+}
+
+.container {
+    width: 90%;
+    max-width: 450px;
+    margin: 25px auto;
+}
+
+.card {
+    background: var(--white);
+    padding: 22px;
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(120, 90, 180, 0.10);
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 21px;
+    margin-bottom: 15px;
+    color: var(--dark);
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 14px;
+    margin: 9px 0;
+    border: 1px solid #E4D9FA;
+    border-radius: 11px;
+    background: #FCFAFF;
+    font-size: 15px;
+    outline: none;
+}
+
+input:focus {
+    border-color: var(--primary);
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: var(--primary);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #9270E8;
+}
+
+a {
+    color: #8B6BD6;
+    text-decoration: none;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text);
+    font-size: 12px;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 22px;
+    }
+
+    .container {
+        width: 92%;
+    }
+}

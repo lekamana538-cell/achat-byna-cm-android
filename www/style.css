@@ -173,3 +173,21 @@ body {
     padding-top: 75px;
 }
 
+
+/* Navigation rouge et blanc */
+#bottomNav {
+    background: #FFFFFF;
+    border-bottom: 3px solid #E60000;
+    box-shadow: 0 3px 12px rgba(180, 0, 0, 0.15);
+}
+
+#bottomNav .nav-btn {
+    color: #CC0000;
+}
+
+#bottomNav .nav-btn.active {
+    color: #FFFFFF;
+    background: #E60000;
+    border-radius: 10px;
+}
+

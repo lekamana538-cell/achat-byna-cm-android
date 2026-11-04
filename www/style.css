@@ -206,3 +206,46 @@ body {
     padding-top: 0;
 }
 
+
+/* Navigation en haut, sans position fixe */
+#bottomNav {
+    position: static;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 3px;
+    margin: 0 auto 15px;
+    background: #FFFFFF;
+    border-bottom: 2px solid #E60000;
+    box-shadow: 0 2px 8px rgba(180, 0, 0, 0.10);
+    border-radius: 0 0 12px 12px;
+}
+
+#bottomNav.hidden {
+    display: none;
+}
+
+#bottomNav .nav-btn {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 8px 2px;
+    background: transparent;
+    color: #CC0000;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+#bottomNav .nav-btn.active {
+    background: #E60000;
+    color: #FFFFFF;
+    border-radius: 10px;
+}
+
+body {
+    padding-top: 0;
+}

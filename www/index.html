@@ -26,8 +26,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 
 label{display:block;font-size:13px;font-weight:700;margin-top:10px;color:#62565a}
 header.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;backdrop-filter:blur(12px)}
 .brand{display:flex;align-items:center;gap:10px}
-.brand-mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,var(--red),var(--red-dark));color:white;display:grid;place-items:center;font-size:25px;box-shadow:0 5px 14px rgba(181,18,44,.2)}
-.brand h1{font-size:15px;margin:0;letter-spacing:.5px}
+.brand-mark{width:58px;height:58px;flex-shrink:0;border-radius:19px;background:linear-gradient(145deg,#fffaf0,#f8e9bd);border:2px solid var(--gold);color:var(--red);display:grid;place-items:center;font-size:39px;box-shadow:0 5px 16px rgba(181,18,44,.16)}
+.brand h1{font-family:Georgia,serif;font-size:17px;font-weight:900;letter-spacing:1px;color:var(--red);text-shadow:0 1px 0 #f8e9bd;margin:0}
 .brand p{font-size:11px;color:var(--muted);margin:3px 0 0}
 .container{max-width:1100px;margin:auto;padding:16px}
 .hidden{display:none!important}
@@ -42,7 +42,7 @@ header.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.97);
 .hero-illustration{position:absolute;right:0;bottom:0;width:46%;height:100%;pointer-events:none}
 .hero-sun{position:absolute;width:100px;height:100px;border-radius:50%;background:var(--gold);right:25px;top:28px;opacity:.9}
 .hero-land{position:absolute;bottom:-35px;right:-15px;width:115%;height:115px;background:#f0c879;border-radius:50% 50% 0 0}
-.hero-panda{position:absolute;z-index:2;right:48px;bottom:43px;font-size:75px;filter:drop-shadow(0 6px 4px rgba(0,0,0,.12))}
+.hero-panda{position:absolute;z-index:2;right:48px;bottom:43px;font-size:100px;filter:drop-shadow(0 7px 6px rgba(0,0,0,.22))}
 .hero-baobab{position:absolute;z-index:2;right:5px;bottom:47px;font-size:48px}
 .hero-bamboo{position:absolute;z-index:2;right:145px;bottom:32px;font-size:38px}
 .hero-decoration{position:absolute;inset:0;pointer-events:none}
@@ -163,7 +163,7 @@ footer{text-align:center;color:#999;font-size:11px;padding:22px}
 @media(max-width:420px){
 .hero-content{max-width:65%}
 .hero h2{font-size:23px}
-.hero-panda{font-size:60px;right:25px}
+.hero-panda{font-size:78px;right:25px}
 .hero-baobab{font-size:37px}
 .hero-bamboo{right:110px}
 }
@@ -173,7 +173,7 @@ footer{text-align:center;color:#999;font-size:11px;padding:22px}
 <body>
 <header class="topbar">
  <div class="brand">
-  <div class="brand-mark">🇨🇳🇲🇬</div>
+  <div class="brand-mark">🐼</div>
   <div><h1>ACHAT BYNA C&M</h1><p>Votre boutique d'achat en Chine</p></div>
  </div>
  <button id="headerAccountBtn" class="secondary" type="button">Mon compte</button>
@@ -190,7 +190,7 @@ footer{text-align:center;color:#999;font-size:11px;padding:22px}
 
 <section id="authSection" class="auth-wrap">
  <div class="auth-logo">
-  <div class="brand-mark">🇨🇳🇲🇬</div>
+  <div class="brand-mark">🐼</div>
   <h2>Achat Byna C&M</h2>
   <p class="muted">Vos achats en Chine, livrés à Madagascar.</p>
  </div>
@@ -241,7 +241,7 @@ footer{text-align:center;color:#999;font-size:11px;padding:22px}
    </div>
    <div class="hero-illustration" aria-hidden="true">
     <div class="hero-sun"></div><div class="hero-land"></div>
-    <div class="hero-baobab">🌳</div><div class="hero-panda">🚢</div><span class="hero-bamboo">✈️</span>
+    <div class="hero-baobab">🌳</div><div class="hero-panda">🐼</div><span class="hero-bamboo">🎋</span>
    </div>
   </section>
   <div class="search-wrap"><span class="search-icon">⌕</span><input id="productSearch" type="search" placeholder="Rechercher un produit..."></div>

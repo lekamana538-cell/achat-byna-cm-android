@@ -117,3 +117,59 @@ footer {
         width: 92%;
     }
 }
+
+/* Navigation fixe en haut */
+.nav-btn {
+    position: relative;
+}
+
+
+/* Navigation fixe en haut */
+#bottomNav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    z-index: 9999;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    padding: 8px 3px;
+    background: #F5F0FF;
+    box-shadow: 0 3px 12px rgba(120, 90, 180, 0.15);
+    border-radius: 0 0 15px 15px;
+}
+
+#bottomNav.hidden {
+    display: none;
+}
+
+#bottomNav .nav-btn {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 8px 2px;
+    background: transparent;
+    color: #7655B5;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+#bottomNav .nav-btn.active {
+    color: #9B75E8;
+    font-weight: bold;
+}
+
+#bottomNav .nav-icon {
+    font-size: 20px;
+}
+
+body {
+    padding-top: 75px;
+}
+

@@ -191,3 +191,18 @@ body {
     border-radius: 10px;
 }
 
+
+/* Navigation qui défile avec la page */
+#bottomNav {
+    position: static;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    box-shadow: none;
+}
+
+body {
+    padding-top: 0;
+}
+

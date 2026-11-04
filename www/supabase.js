@@ -1,15 +1,14 @@
-
 const SUPABASE_URL = "https://lnpydydsilutnvzhtlfm.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_GPNjFrtmabCMU2Bem8vloA_tTlCZNj0";
 
-const supabaseClient = window.supabase.createClient(
+window.supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
 async function testSupabase() {
-    const { error } = await supabaseClient
+    const { error } = await window.supabaseClient
         .from("profiles")
         .select("id")
         .limit(1);

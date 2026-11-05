@@ -311,6 +311,77 @@ button:active{
  }
 }
 
+
+/* Nouvelle identite visuelle : lavande et verre nacre */
+body{
+ background:
+  radial-gradient(ellipse at 8% 5%,rgba(174,126,235,.22),transparent 38%),
+  radial-gradient(ellipse at 92% 35%,rgba(216,190,250,.30),transparent 42%),
+  linear-gradient(145deg,#f5efff 0%,#eee5fa 48%,#faf5ff 100%);
+}
+
+header.topbar,
+.bottom-nav{
+ background:rgba(250,246,255,.76);
+ border:1px solid rgba(255,255,255,.88);
+ box-shadow:0 8px 28px rgba(91,49,133,.13),
+            inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.card,
+.product-card,
+.cart-item,
+.order-card,
+.client-item,
+.ticket-card,
+.admin-product,
+.stat,
+.payment-box,
+.recipient,
+.proof-form,
+.chat-box,
+.date-field,
+.product-detail-main,
+.product-detail-thumb{
+ background:rgba(255,255,255,.52);
+ border:1px solid rgba(255,255,255,.88);
+ box-shadow:0 8px 26px rgba(91,49,133,.11),
+            inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.category-chip{
+ background:rgba(255,255,255,.58);
+ border:1px solid rgba(255,255,255,.9);
+ box-shadow:0 5px 16px rgba(91,49,133,.09);
+}
+
+.category-chip.active,
+.transport-option.selected{
+ background:rgba(248,233,189,.72);
+ border-color:rgba(214,173,85,.55);
+}
+
+input,textarea,select{
+ background:rgba(255,255,255,.66);
+ border-color:rgba(174,126,235,.24);
+}
+
+@media(max-width:600px){
+ header.topbar,.bottom-nav{
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+ }
+ .card,.product-card,.cart-item,.order-card,
+ .client-item,.ticket-card,.admin-product,.stat,
+ .payment-box,.recipient,.proof-form,.chat-box,.date-field,
+ .product-detail-main,.product-detail-thumb{
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  box-shadow:0 5px 16px rgba(91,49,133,.08),
+             inset 0 1px 0 rgba(255,255,255,.9);
+ }
+}
+
 </style>
 </head>
 

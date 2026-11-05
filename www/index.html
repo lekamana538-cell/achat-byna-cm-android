@@ -529,12 +529,27 @@ button:active{
    <form id="productForm">
     <input type="hidden" id="productId">
     <label>Nom du produit</label><input id="adminProductName" placeholder="Nom du produit" required>
-    <label>Catégorie</label><input id="adminProductCategory" list="categorySuggestions" placeholder="Ex. Téléphones" required>
-    <datalist id="categorySuggestions">
-     <option>Vêtements</option><option>Chaussures</option><option>Sacs & accessoires</option><option>Cosmétiques</option>
-     <option>Téléphones</option><option>Ordinateurs</option><option>Électronique</option><option>Montres & bijoux</option>
-     <option>Bébé & enfants</option><option>Électroménager</option><option>Sport</option><option>Fournitures</option>
-    </datalist>
+    <label>Catégorie</label>
+    <select id="adminProductCategory" required>
+     <option value="">Sélectionnez une catégorie</option>
+     <option>Vêtements</option>
+     <option>Chaussures</option>
+     <option>Sacs & accessoires</option>
+     <option>Cosmétiques</option>
+     <option>Téléphones</option>
+     <option>Ordinateurs</option>
+     <option>Électronique</option>
+     <option>Montres & bijoux</option>
+     <option>Bébé & enfants</option>
+     <option>Électroménager</option>
+     <option>Sport</option>
+     <option>Fournitures</option>
+     <option>Bicyclette</option>
+     <option>Pièces automobiles et motos</option>
+     <option>Divers articles</option>
+     <option>Santé et médicaments</option>
+     <option>Fleurs naturelles</option>
+    </select>
     <p class="muted">Choisissez une catégorie. Tous les produits publiés dans cette catégorie apparaîtront ensemble chez les clients.</p>
     <label>Description</label><textarea id="adminProductDescription" rows="3" placeholder="Description du produit"></textarea>
     <label>Prix en Ariary</label><input type="number" id="adminProductPrice" min="1" step="1" placeholder="Prix en Ar" required>
@@ -1528,6 +1543,10 @@ async function loadAdminProducts(){
 
 function resetProductForm(){
  $("productForm").reset();
+ const categorySelect=$("adminProductCategory");
+ Array.from(categorySelect.options).forEach(option=>{
+  if(option.dataset.legacy==="true") option.remove();
+ });
  $("productId").value="";
  $("saveProductButton").textContent="Publier le produit";
  $("cancelEditButton").classList.add("hidden");
@@ -1539,7 +1558,16 @@ function editProduct(product){
  const value=key=>Array.isArray(options[key])?options[key].join(", "):"";
  $("productId").value=product.id;
  $("adminProductName").value=product.name||"";
- $("adminProductCategory").value=product.category||"";
+ const categorySelect=$("adminProductCategory");
+ const category=product.category||"";
+ if(category&&!Array.from(categorySelect.options).some(option=>option.value===category)){
+  const legacyOption=document.createElement("option");
+  legacyOption.value=category;
+  legacyOption.textContent=category;
+  legacyOption.dataset.legacy="true";
+  categorySelect.append(legacyOption);
+ }
+ categorySelect.value=category;
  $("adminProductDescription").value=product.description||"";
  $("adminProductPrice").value=product.price_mga||"";
  $("adminProductWeight").value=product.weight_kg??"";

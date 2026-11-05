@@ -167,6 +167,18 @@ footer{text-align:center;color:#999;font-size:11px;padding:22px}
 .hero-baobab{font-size:37px}
 .hero-bamboo{right:110px}
 }
+
+.product-detail-gallery{display:grid;gap:10px;margin:16px 0}
+.product-detail-main{width:100%;aspect-ratio:1/1;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:18px}
+.product-detail-thumbs{display:flex;gap:9px;overflow-x:auto;padding:3px}
+.product-detail-thumb{width:72px;height:72px;flex:0 0 72px;object-fit:cover;border:2px solid var(--line);border-radius:12px;cursor:pointer}
+.product-detail-thumb.active{border-color:var(--red)}
+.product-option-group{margin:16px 0}
+.product-option-group label{margin-bottom:7px}
+.product-option-select{max-width:100%}
+.product-detail-title{font-size:23px;margin:16px 0 8px}
+.product-detail-price{font-size:22px;font-weight:800;color:var(--red)}
+.product-detail-description{line-height:1.7;color:var(--muted);white-space:pre-wrap}
 </style>
 </head>
 
@@ -257,6 +269,12 @@ footer{text-align:center;color:#999;font-size:11px;padding:22px}
   <div id="categoryGridFull" class="category-grid"></div>
   <div class="section-head"><h2 id="categoryProductsTitle">Tous les produits</h2></div>
   <div id="categoryProducts" class="product-grid"></div>
+ </div>
+
+
+ <div id="productDetailView" class="app-view hidden">
+  <button type="button" class="outline" id="backToProductsButton">Retour aux produits</button>
+  <div id="productDetailContent"></div>
  </div>
 
  <div id="favoritesView" class="app-view hidden">
@@ -390,8 +408,29 @@ footer{text-align:center;color:#999;font-size:11px;padding:22px}
     <label>Prix en Ariary</label><input type="number" id="adminProductPrice" min="1" step="1" placeholder="Prix en Ar" required>
     <label>Poids du produit (kg)</label><input type="number" id="adminProductWeight" min="0" step="0.001" placeholder="Ex. 0.500">
     <label>Volume du produit (m³)</label><input type="number" id="adminProductVolume" min="0" step="0.000001" placeholder="Ex. 0.025">
-    <label>Photo du produit</label><input type="file" id="adminProductImage" accept="image/jpeg,image/png,image/webp">
-    <p class="muted">Formats JPG, PNG ou WEBP, maximum 5 Mo.</p>
+    <label>Photo principale du produit</label>
+    <input type="file" id="adminProductImage" accept="image/jpeg,image/png,image/webp">
+    <label>Galerie de photos supplémentaires</label>
+    <input type="file" id="adminProductImages" accept="image/jpeg,image/png,image/webp" multiple>
+    <p class="muted">Ajoutez autant de photos que nécessaire. Formats JPG, PNG ou WEBP, maximum 5 Mo par image.</p>
+    <div class="card">
+     <h4>Options disponibles pour ce produit</h4>
+     <label>Tailles adulte</label>
+     <input id="adminProductSizes" placeholder="S, M, L, XL">
+     <label>Tailles enfant</label>
+     <input id="adminProductChildSizes" placeholder="70, 80, 90, 100, 110, 120, 130, 140, 150">
+     <label>Pointures</label>
+     <input id="adminProductShoesSizes" placeholder="36, 37, 38, 39, 40, 41, 42, 43">
+     <label>Couleurs</label>
+     <input id="adminProductColors" placeholder="Noir, Blanc, Rouge, Bleu">
+     <label>Modèles</label>
+     <input id="adminProductModels" placeholder="Modèle A, Modèle B">
+     <label>Capacités</label>
+     <input id="adminProductCapacities" placeholder="64 Go, 128 Go, 256 Go">
+     <label>Contenances</label>
+     <input id="adminProductVolumes" placeholder="30 ml, 50 ml, 100 ml">
+     <p class="muted">Renseignez uniquement les options adaptées à la catégorie du produit.</p>
+    </div>
     <button type="submit" id="saveProductButton" class="full">Publier le produit</button>
     <button type="button" id="cancelEditButton" class="full secondary hidden" style="margin-top:8px">Annuler la modification</button>
     <p id="productFormMessage" class="message"></p>
@@ -731,6 +770,142 @@ function renderCategories(){
  draw("categoryGridFull",true);
 }
 
+
+let currentDetailProduct=null;
+let currentDetailImage=0;
+let previousClientView="homeView";
+
+function openProductDetail(product){
+ currentDetailProduct=product;
+ currentDetailImage=0;
+ previousClientView=document.querySelector(".app-view:not(.hidden)")?.id||"homeView";
+ renderProductDetail();
+ showClientView("productDetailView");
+}
+
+function renderProductDetail(){
+ const product=currentDetailProduct;
+ if(!product)return;
+
+ const root=$("productDetailContent");
+ root.replaceChildren();
+
+ const images=Array.isArray(product.images)&&product.images.length
+  ?product.images.filter(Boolean)
+  :product.image_url?[product.image_url]:[];
+
+ const gallery=document.createElement("div");
+ gallery.className="product-detail-gallery";
+
+ if(images.length){
+  const main=document.createElement("img");
+  main.className="product-detail-main";
+  main.src=images[currentDetailImage]||images[0];
+  main.alt=product.name;
+  gallery.append(main);
+
+  const thumbs=document.createElement("div");
+  thumbs.className="product-detail-thumbs";
+
+  images.forEach((url,index)=>{
+   const thumb=document.createElement("img");
+   thumb.className="product-detail-thumb"+(index===currentDetailImage?" active":"");
+   thumb.src=url;
+   thumb.alt=product.name+" - photo "+(index+1);
+   thumb.addEventListener("click",()=>{
+    currentDetailImage=index;
+    renderProductDetail();
+   });
+   thumbs.append(thumb);
+  });
+  gallery.append(thumbs);
+ }else{
+  gallery.append(p("Aucune photo disponible."));
+ }
+
+ root.append(gallery);
+
+ const title=document.createElement("h2");
+ title.className="product-detail-title";
+ title.textContent=product.name;
+ root.append(title);
+
+ const category=p(product.category||"Produit");
+ category.className="pill";
+ root.append(category);
+
+ const price=p(money(product.price_mga));
+ price.className="product-detail-price";
+ root.append(price);
+
+ const description=p(product.description||"");
+ description.className="product-detail-description";
+ root.append(description);
+
+ const options=product.options||{};
+ const fields=[
+  ["sizes","Taille"],
+  ["child_sizes","Taille enfant"],
+  ["shoe_sizes","Pointure"],
+  ["colors","Couleur"],
+  ["models","Modèle"],
+  ["capacities","Capacité"],
+  ["volumes","Contenance"]
+ ];
+
+ const selected={};
+
+ fields.forEach(([key,label])=>{
+  const values=Array.isArray(options[key])?options[key]:[];
+  if(!values.length)return;
+
+  const group=document.createElement("div");
+  group.className="product-option-group";
+
+  const caption=document.createElement("label");
+  caption.textContent=label;
+  group.append(caption);
+
+  const select=document.createElement("select");
+  select.className="product-option-select";
+  select.required=true;
+
+  const placeholder=document.createElement("option");
+  placeholder.value="";
+  placeholder.textContent="Choisir : "+label.toLowerCase();
+  select.append(placeholder);
+
+  values.forEach(value=>{
+   const option=document.createElement("option");
+   option.value=value;
+   option.textContent=value;
+   select.append(option);
+  });
+
+  select.addEventListener("change",()=>{
+   selected[key]=select.value;
+  });
+
+  group.append(select);
+  root.append(group);
+ });
+
+ const add=btn("Ajouter au panier","",()=>{
+  const missing=fields.some(([key])=>{
+   return Array.isArray(options[key])&&options[key].length&&!selected[key];
+  });
+
+  if(missing){
+   alert("Veuillez choisir toutes les options du produit.");
+   return;
+  }
+
+  addToCart(product,1,selected);
+ });
+
+ root.append(add);
+}
+
 function productCard(product){
  const card=document.createElement("article");
  card.className="product-card";
@@ -740,11 +915,15 @@ function productCard(product){
   img.src=product.image_url;
   img.alt=product.name;
   img.loading="lazy";
+  img.style.cursor="pointer";
+  img.addEventListener("click",()=>openProductDetail(product));
   card.append(img);
  }
  const name=document.createElement("div");
  name.className="product-name";
  name.textContent=product.name;
+ name.style.cursor="pointer";
+ name.addEventListener("click",()=>openProductDetail(product));
  card.append(name);
  const cat=document.createElement("span");
  cat.className="pill";
@@ -821,7 +1000,7 @@ function renderFavorites(){
 async function loadShopProducts(){
  msg("shopMessage","Chargement des produits...");
  const {data,error}=await supabaseClient.from("products")
-  .select("id,name,category,description,price_mga,image_url,weight_kg,volume_m3")
+  .select("id,name,category,description,price_mga,image_url,images,options,weight_kg,volume_m3")
   .eq("is_active",true).eq("is_available",true)
   .order("created_at",{ascending:false});
  if(error){
@@ -840,10 +1019,27 @@ $("productSearch").addEventListener("input",()=>{
  renderCategoryProducts();
 });
 
-function addToCart(product,quantity){
- const found=cart.find(x=>x.id===product.id);
- if(found)found.quantity+=quantity;
- else cart.push({id:product.id,name:product.name,price:Number(product.price_mga),weight_kg:Number(product.weight_kg||0),volume_m3:Number(product.volume_m3||0),quantity});
+function addToCart(product,quantity,options={}){
+ const selectedOptions={...options};
+ const found=cart.find(x=>
+  x.id===product.id&&
+  JSON.stringify(x.options||{})===JSON.stringify(selectedOptions)
+ );
+
+ if(found){
+  found.quantity+=quantity;
+ }else{
+  cart.push({
+   id:product.id,
+   name:product.name,
+   price:Number(product.price_mga),
+   weight_kg:Number(product.weight_kg||0),
+   volume_m3:Number(product.volume_m3||0),
+   options:selectedOptions,
+   quantity
+  });
+ }
+
  renderCart();
  showClientView("cartView");
 }
@@ -863,7 +1059,25 @@ function renderCart(){
   box.className="cart-item";
   const h=document.createElement("h4");
   h.textContent=item.name;
-  box.append(h,p("Prix unitaire : "+money(item.price)),p("Sous-total : "+money(item.price*item.quantity)));
+  box.append(h);
+  const optionLabels={
+   sizes:"Taille",
+   child_sizes:"Taille enfant",
+   shoe_sizes:"Pointure",
+   colors:"Couleur",
+   models:"Modèle",
+   capacities:"Capacité",
+   volumes:"Contenance"
+  };
+  Object.entries(item.options||{}).forEach(([key,value])=>{
+   if(value){
+    box.append(p((optionLabels[key]||key)+" : "+value));
+   }
+  });
+  box.append(
+   p("Prix unitaire : "+money(item.price)),
+   p("Sous-total : "+money(item.price*item.quantity))
+  );
   const row=document.createElement("div");
   row.className="qty-row";
   row.append(
@@ -998,7 +1212,8 @@ $("orderForm").addEventListener("submit",async e=>{
    price:x.price,
    quantity:x.quantity,
    weight_kg:x.weight_kg,
-   volume_m3:x.volume_m3
+   volume_m3:x.volume_m3,
+   options:x.options||{}
   }));
 
   const order={
@@ -1188,6 +1403,8 @@ function resetProductForm(){
 }
 
 function editProduct(product){
+ const options=product.options||{};
+ const value=key=>Array.isArray(options[key])?options[key].join(", "):"";
  $("productId").value=product.id;
  $("adminProductName").value=product.name||"";
  $("adminProductCategory").value=product.category||"";
@@ -1195,6 +1412,13 @@ function editProduct(product){
  $("adminProductPrice").value=product.price_mga||"";
  $("adminProductWeight").value=product.weight_kg??"";
  $("adminProductVolume").value=product.volume_m3??"";
+ $("adminProductSizes").value=value("sizes");
+ $("adminProductChildSizes").value=value("child_sizes");
+ $("adminProductShoesSizes").value=value("shoe_sizes");
+ $("adminProductColors").value=value("colors");
+ $("adminProductModels").value=value("models");
+ $("adminProductCapacities").value=value("capacities");
+ $("adminProductVolumes").value=value("volumes");
  $("saveProductButton").textContent="Enregistrer les modifications";
  $("cancelEditButton").classList.remove("hidden");
  $("productForm").scrollIntoView({behavior:"smooth"});
@@ -1208,22 +1432,47 @@ $("productForm").addEventListener("submit",async e=>{
  b.disabled=true;
  const id=$("productId").value;
  try{
-  let imageUrl=null;
+  let images=[];
   if(id){
-   const old=await supabaseClient.from("products").select("image_url").eq("id",id).single();
+   const old=await supabaseClient.from("products").select("image_url,images").eq("id",id).single();
    if(old.error)throw old.error;
-   imageUrl=old.data.image_url;
+   images=Array.isArray(old.data.images)?old.data.images.filter(Boolean):[];
+   if(!images.length&&old.data.image_url)images=[old.data.image_url];
   }
-  const file=$("adminProductImage").files[0];
-  if(file){
+
+  const uploadImage=async file=>{
    if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024)
     throw new Error("Image invalide ou supérieure à 5 Mo.");
    const ext=file.type==="image/jpeg"?"jpg":file.type==="image/png"?"png":"webp";
-   const path=currentSession.user.id+"/"+Date.now()+"."+ext;
+   const path=currentSession.user.id+"/"+Date.now()+"-"+Math.random().toString(36).slice(2)+"."+ext;
    const up=await supabaseClient.storage.from("product-images").upload(path,file,{contentType:file.type});
    if(up.error)throw up.error;
-   imageUrl=supabaseClient.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+   return supabaseClient.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+  };
+
+  const mainFile=$("adminProductImage").files[0];
+  if(mainFile){
+   const mainUrl=await uploadImage(mainFile);
+   images=[mainUrl,...images.filter(url=>url!==mainUrl)];
   }
+
+  const extraFiles=Array.from($("adminProductImages").files||[]);
+  for(const file of extraFiles){
+   const url=await uploadImage(file);
+   images.push(url);
+  }
+
+  const readOptions=id=>$(id).value.split(",").map(value=>value.trim()).filter(Boolean);
+  const options={
+   sizes:readOptions("adminProductSizes"),
+   child_sizes:readOptions("adminProductChildSizes"),
+   shoe_sizes:readOptions("adminProductShoesSizes"),
+   colors:readOptions("adminProductColors"),
+   models:readOptions("adminProductModels"),
+   capacities:readOptions("adminProductCapacities"),
+   volumes:readOptions("adminProductVolumes")
+  };
+
   const payload={
    name:$("adminProductName").value.trim(),
    category:$("adminProductCategory").value.trim(),
@@ -1231,7 +1480,10 @@ $("productForm").addEventListener("submit",async e=>{
    price_mga:Number($("adminProductPrice").value),
    weight_kg:$("adminProductWeight").value===""?null:Number($("adminProductWeight").value),
    volume_m3:$("adminProductVolume").value===""?null:Number($("adminProductVolume").value),
-   image_url:imageUrl,is_active:true,is_available:true
+   image_url:images[0]||null,
+   images,
+   options,
+   is_active:true,is_available:true
   };
   const result=id
    ?await supabaseClient.from("products").update(payload).eq("id",id)
@@ -1355,6 +1607,11 @@ function buildAdminOrderCard(order){
   p("Email / ID client : "+(order.user_id||"—")),
   p("Date de commande : "+date(order.created_at)),
   p("Articles : "+(order.items||[]).map(x=>x.name+" × "+x.quantity).join(", ")),
+  ...(order.items||[]).map(item=>{
+   const labels={sizes:"Taille",child_sizes:"Taille enfant",shoe_sizes:"Pointure",colors:"Couleur",models:"Modèle",capacities:"Capacité",volumes:"Contenance"};
+   const details=Object.entries(item.options||{}).filter(([key,value])=>value).map(([key,value])=>(labels[key]||key)+" : "+value).join(" | ");
+   return p(item.name+" — Options sélectionnées : "+(details||"Aucune option"));
+  }),
   p("Montant des produits : "+money(order.product_total_mga??(Number(order.total_mga||0)-Number(order.freight_mga||0)))),
   p("Frais de transport : communiqués séparément"),
   p("MONTANT À PAYER POUR LES PRODUITS : "+money(order.product_total_mga??(Number(order.total_mga||0)-Number(order.freight_mga||0)))) ,
@@ -1822,6 +2079,11 @@ async function startApp(){
  }
  await updateAccount(data.session);
 }
+
+
+$("backToProductsButton").addEventListener("click",()=>{
+ showClientView("homeView");
+});
 
 startApp();
 

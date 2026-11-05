@@ -179,6 +179,116 @@ footer{text-align:center;color:#999;font-size:11px;padding:22px}
 .product-detail-title{font-size:23px;margin:16px 0 8px}
 .product-detail-price{font-size:22px;font-weight:800;color:var(--red)}
 .product-detail-description{line-height:1.7;color:var(--muted);white-space:pre-wrap}
+
+/* DESIGN GLASSMORPHISM - Palette originale conservee */
+body{
+ background:
+  radial-gradient(ellipse at 10% 5%,rgba(214,173,85,.10),transparent 35%),
+  radial-gradient(ellipse at 90% 30%,rgba(181,18,44,.07),transparent 38%),
+  var(--bg);
+}
+
+header.topbar,
+.bottom-nav{
+ background:rgba(255,250,246,.78);
+ backdrop-filter:blur(18px);
+ -webkit-backdrop-filter:blur(18px);
+ border:1px solid rgba(255,255,255,.65);
+ box-shadow:0 8px 28px rgba(83,18,30,.09);
+}
+
+.card,
+.product-card,
+.cart-item,
+.order-card,
+.client-item,
+.ticket-card,
+.admin-product,
+.stat,
+.payment-box,
+.recipient,
+.proof-form,
+.chat-box,
+.date-field{
+ background:rgba(255,255,255,.68);
+ backdrop-filter:blur(16px);
+ -webkit-backdrop-filter:blur(16px);
+ border:1px solid rgba(255,255,255,.82);
+ box-shadow:0 8px 26px rgba(83,18,30,.08),
+            inset 0 1px 0 rgba(255,255,255,.75);
+}
+
+.card{border-radius:22px}
+.product-card{border-radius:20px}
+.cart-item,.order-card,.client-item,.ticket-card,.admin-product,.stat{
+ border-radius:17px;
+}
+
+input,textarea,select{
+ background:rgba(255,250,246,.72);
+ backdrop-filter:blur(10px);
+ -webkit-backdrop-filter:blur(10px);
+ border:1px solid rgba(214,173,85,.25);
+ box-shadow:inset 0 1px 3px rgba(83,18,30,.035);
+}
+
+input:focus,textarea:focus,select:focus{
+ background:rgba(255,255,255,.92);
+}
+
+button{
+ box-shadow:0 5px 14px rgba(83,18,30,.13),
+            inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+button:active{
+ transform:scale(.98);
+}
+
+.category-chip,
+.transport-option,
+.recipient,
+.timeline span,
+.pill,
+.status{
+ backdrop-filter:blur(12px);
+ -webkit-backdrop-filter:blur(12px);
+}
+
+.category-chip{
+ background:rgba(255,255,255,.65);
+ border-color:rgba(255,255,255,.85);
+ box-shadow:0 5px 16px rgba(83,18,30,.055);
+}
+
+.category-chip.active,
+.transport-option.selected{
+ background:rgba(248,233,189,.68);
+}
+
+.bottom-nav{
+ border-top:1px solid rgba(255,255,255,.8);
+}
+
+.hero{
+ box-shadow:0 12px 30px rgba(83,18,30,.15);
+}
+
+.product-detail-main,
+.product-detail-thumb{
+ background:rgba(255,255,255,.72);
+ backdrop-filter:blur(12px);
+ -webkit-backdrop-filter:blur(12px);
+}
+
+@media(max-width:600px){
+ .card,.product-card,.cart-item,.order-card,
+ .client-item,.ticket-card,.admin-product{
+  box-shadow:0 6px 20px rgba(83,18,30,.07),
+             inset 0 1px 0 rgba(255,255,255,.7);
+ }
+}
+
 </style>
 </head>
 

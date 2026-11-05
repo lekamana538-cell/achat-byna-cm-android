@@ -412,7 +412,7 @@ footer{text-align:center;color:#999;font-size:11px;padding:22px}
     <input type="file" id="adminProductImage" accept="image/jpeg,image/png,image/webp">
     <label>Galerie de photos supplémentaires</label>
     <input type="file" id="adminProductImages" accept="image/jpeg,image/png,image/webp" multiple>
-    <p class="muted">Ajoutez autant de photos que nécessaire. Formats JPG, PNG ou WEBP, maximum 5 Mo par image.</p>
+    <p class="muted">Ajoutez jusqu'à 7 photos supplémentaires. Maximum 8 photos au total, formats JPG, PNG ou WEBP, 5 Mo par image.</p>
     <div class="card">
      <h4>Options disponibles pour ce produit</h4>
      <label>Tailles adulte</label>
@@ -1457,6 +1457,13 @@ $("productForm").addEventListener("submit",async e=>{
   }
 
   const extraFiles=Array.from($("adminProductImages").files||[]);
+
+  if(extraFiles.length>7)
+   throw new Error("La galerie accepte au maximum 7 photos supplémentaires.");
+
+  if(images.length+extraFiles.length>8)
+   throw new Error("Un produit ne peut pas dépasser 8 photos au total.");
+
   for(const file of extraFiles){
    const url=await uploadImage(file);
    images.push(url);

@@ -289,6 +289,28 @@ button:active{
  }
 }
 
+
+/* Optimisation des performances mobiles */
+@media(max-width:600px){
+ header.topbar,.bottom-nav{
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+ }
+ .card,.product-card,.cart-item,.order-card,
+ .client-item,.ticket-card,.admin-product,.stat,
+ .payment-box,.recipient,.proof-form,.chat-box,.date-field{
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+  box-shadow:0 4px 14px rgba(83,18,30,.055);
+ }
+ input,textarea,select,
+ .category-chip,.transport-option,
+ .product-detail-main,.product-detail-thumb{
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+ }
+}
+
 </style>
 </head>
 

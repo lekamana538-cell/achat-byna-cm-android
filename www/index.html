@@ -593,7 +593,7 @@ function paymentInfo(amount){
  });
  const t=p("MONTANT EXACT À ENVOYER : "+money(amount));
  t.className="total";
- box.append(t,p("Les frais de transport sont inclus dans le montant indiqué."));
+ box.append(t,p("Les frais de transport seront communiqués séparément après la commande."));
  return box;
 }
 
@@ -889,20 +889,15 @@ async function calculateShipping(method){
  if(!option)throw new Error("Veuillez choisir un mode de transport valide.");
 
  let quantity=0;
- let freight=0;
- let rate=null;
 
  if(method==="maritime"){
   const missing=cart.filter(x=>!Number.isFinite(Number(x.volume_m3))||Number(x.volume_m3)<=0);
   if(missing.length)throw new Error("Volume manquant pour : "+missing.map(x=>x.name).join(", ")+". Complétez les volumes dans l'espace administrateur.");
   quantity=cart.reduce((sum,x)=>sum+Number(x.volume_m3)*x.quantity,0);
-  rate=await loadUsdMgaRate();
-  freight=Math.ceil(quantity*option.rate*rate);
  }else{
   const missing=cart.filter(x=>!Number.isFinite(Number(x.weight_kg))||Number(x.weight_kg)<=0);
   if(missing.length)throw new Error("Poids manquant pour : "+missing.map(x=>x.name).join(", ")+". Complétez les poids dans l'espace administrateur.");
   quantity=cart.reduce((sum,x)=>sum+Number(x.weight_kg)*x.quantity,0);
-  freight=Math.ceil(quantity*option.rate);
  }
 
  const productTotal=cart.reduce((sum,x)=>sum+x.price*x.quantity,0);
@@ -910,10 +905,10 @@ async function calculateShipping(method){
  return {
   method,
   quantity,
-  freight,
+  freight:0,
   productTotal,
-  total:productTotal+freight,
-  exchangeRate:rate,
+  total:productTotal,
+  exchangeRate:null,
   days:shippingDefaults[method]
  };
 }
@@ -924,7 +919,7 @@ async function refreshCheckoutQuote(){
  const paymentRoot=$("checkoutPaymentInfo");
  if(!quoteRoot||!totalsRoot||!paymentRoot)return;
 
- quoteRoot.textContent="Calcul des frais de transport...";
+ quoteRoot.textContent="Calcul de l'estimation du transport...";
  totalsRoot.replaceChildren();
  paymentRoot.replaceChildren();
  currentShippingQuote=null;
@@ -938,25 +933,24 @@ async function refreshCheckoutQuote(){
 
   quoteRoot.replaceChildren(
    p("Transport : "+option.label),
-   p("Quantité calculée : "+quote.quantity.toFixed(3)+" "+option.unit),
-   p("Délai estimé : "+option.days)
+   p("Quantité estimée : "+quote.quantity.toFixed(3)+" "+option.unit),
+   p("Délai estimé : "+quote.days+" jours")
   );
 
   if(shippingMethod==="maritime"){
-   quoteRoot.append(p("Taux USD/MGA : "+quote.exchangeRate.toLocaleString("fr-FR")+" Ar pour 1 USD"));
-   quoteRoot.append(p("Dernière mise à jour : "+usdMgaRateDate));
-   quoteRoot.append(p("Tarif maritime : 420 USD/m³"));
+   quoteRoot.append(p("Tarif : "+option.rate.toLocaleString("fr-FR")+" USD/m³"));
   }else{
    quoteRoot.append(p("Tarif : "+option.rate.toLocaleString("fr-FR")+" Ar/kg"));
   }
 
+  quoteRoot.append(p("Les frais de transport seront communiqués séparément après la commande."));
+
   totalsRoot.replaceChildren(
    p("Montant des produits : "+money(quote.productTotal)),
-   p("Frais de transport : "+money(quote.freight)),
-   p("TOTAL À PAYER : "+money(quote.total))
+   p("TOTAL À PAYER MAINTENANT : "+money(quote.productTotal))
   );
   totalsRoot.lastElementChild.className="total";
-  paymentRoot.append(paymentInfo(quote.total));
+  paymentRoot.append(paymentInfo(quote.productTotal));
  }catch(err){
   currentShippingQuote=null;
   quoteRoot.textContent=err.message;
@@ -1013,9 +1007,9 @@ $("orderForm").addEventListener("submit",async e=>{
    customer_city:$("customerCity").value.trim(),
    items,
    product_total_mga:quote.productTotal,
-   freight_mga:quote.freight,
-   total_mga:quote.total,
-   exchange_rate_mga:quote.exchangeRate,
+   freight_mga:0,
+   total_mga:quote.productTotal,
+   exchange_rate_mga:null,
    payment_method:"MVola",
    payment_status:"en_attente",
    statut_commande:"en_attente",
@@ -1074,8 +1068,8 @@ async function loadMyOrders(){
    p("Date de commande : "+date(order.created_at)),
    p("Articles : "+(order.items||[]).map(x=>x.name+" × "+x.quantity).join(", ")),
    p("Montant des articles : "+money(order.product_total_mga??(Number(order.total_mga||0)-Number(order.freight_mga||0)))),
-   p("Frais de transport : "+money(order.freight_mga||0)),
-   p("TOTAL À PAYER : "+money(order.total_mga))
+   p("Frais de transport : communiqués séparément"),
+   p("MONTANT À PAYER POUR LES ARTICLES : "+money(order.product_total_mga??(Number(order.total_mga||0)-Number(order.freight_mga||0))))
   );
   const mode=shippingOptions[order.shipping_method]?order.shipping_method:"air_normal";
   card.append(
@@ -1095,7 +1089,7 @@ async function loadMyOrders(){
    timeline.append(span);
   });
   card.append(timeline,p("Suivi : "+getTrackLabel(order.tracking_status)));
-  card.append(paymentInfo(Number(order.total_mga||0)));
+  card.append(paymentInfo(Number(order.product_total_mga??(Number(order.total_mga||0)-Number(order.freight_mga||0)))));
 
   if(!order.payment_proof_url||order.payment_status==="refuse"){
    const form=document.createElement("div");
@@ -1360,8 +1354,8 @@ function buildAdminOrderCard(order){
   p("Date de commande : "+date(order.created_at)),
   p("Articles : "+(order.items||[]).map(x=>x.name+" × "+x.quantity).join(", ")),
   p("Montant des produits : "+money(order.product_total_mga??(Number(order.total_mga||0)-Number(order.freight_mga||0)))),
-  p("Frais de transport : "+money(order.freight_mga||0)),
-  p("TOTAL À PAYER : "+money(order.total_mga)),
+  p("Frais de transport : communiqués séparément"),
+  p("MONTANT À PAYER POUR LES PRODUITS : "+money(order.product_total_mga??(Number(order.total_mga||0)-Number(order.freight_mga||0)))) ,
   p("Expéditeur : "+(order.sender_name||"—")+" / "+(order.sender_phone||"—")),
   p("Référence paiement : "+(order.payment_reference||"—"))
  );
@@ -1393,7 +1387,24 @@ function buildAdminOrderCard(order){
   })
  );
 
- card.append(p("Transport choisi : "+(shippingOptions[order.shipping_method]?.label||"Ancien mode de transport")));
+ const currentMethod=shippingOptions[order.shipping_method]?order.shipping_method:"air_normal";
+ const currentOption=shippingOptions[currentMethod];
+ const quantityField=currentMethod==="maritime"?"volume_m3":"weight_kg";
+ const orderItems=order.items||[];
+ const hasEstimation=orderItems.length>0&&orderItems.every(x=>
+  Number.isFinite(Number(x[quantityField]))&&Number(x[quantityField])>0&&
+  Number(x.quantity)>0
+ );
+ const estimatedQuantity=hasEstimation?orderItems.reduce((sum,x)=>
+  sum+Number(x[quantityField])*Number(x.quantity),0
+ ):null;
+
+ card.append(
+  p("Transport choisi : "+currentOption.label),
+  p("Quantité estimée : "+(hasEstimation?estimatedQuantity.toFixed(3)+" "+currentOption.unit:"Estimation indisponible")),
+  p("Tarif applicable : "+currentOption.rate.toLocaleString("fr-FR")+(currentMethod==="maritime"?" USD/m³":" Ar/kg")),
+  p("Frais de transport : à communiquer séparément")
+ );
 
  const ship=document.createElement("select");
  [["air_normal","Avion normal sans batterie"],["air_express","Avion express sans batterie"],["air_sensitive","Avion batteries, air sensible, cosmétiques"],["maritime","Bateau / transport maritime"]].forEach(([v,l])=>{
@@ -1425,39 +1436,16 @@ function buildAdminOrderCard(order){
    b.disabled=true;
    try{
     const method=ship.value;
-    const option=shippingOptions[method];
-    let quantity=0;
-    let freight=0;
-    let exchangeRate=null;
-
-    if(method==="maritime"){
-     const missing=(order.items||[]).filter(x=>!Number.isFinite(Number(x.volume_m3))||Number(x.volume_m3)<=0);
-     if(missing.length)throw new Error("Volume manquant dans les articles de cette commande.");
-     quantity=order.items.reduce((sum,x)=>sum+Number(x.volume_m3)*Number(x.quantity),0);
-     exchangeRate=await loadUsdMgaRate();
-     freight=Math.ceil(quantity*option.rate*exchangeRate);
-    }else{
-     const missing=(order.items||[]).filter(x=>!Number.isFinite(Number(x.weight_kg))||Number(x.weight_kg)<=0);
-     if(missing.length)throw new Error("Poids manquant dans les articles de cette commande.");
-     quantity=order.items.reduce((sum,x)=>sum+Number(x.weight_kg)*Number(x.quantity),0);
-     freight=Math.ceil(quantity*option.rate);
-    }
-
-    const productTotal=Number(order.product_total_mga??(order.items||[]).reduce((sum,x)=>sum+Number(x.price)*Number(x.quantity),0));
-    const total=productTotal+freight;
 
     const r=await supabaseClient.from("orders")
      .update({
       shipping_method:method,
-      shipping_estimated_days:n,
-      freight_mga:freight,
-      total_mga:total,
-      exchange_rate_mga:exchangeRate
+      shipping_estimated_days:n
      })
      .eq("id",order.id);
 
     if(r.error)throw r.error;
-    alert("Transport, frais et montant total mis à jour.");
+    alert("Mode de transport et délai mis à jour. Les frais seront communiqués séparément.");
     await loadAllOrders();
    }catch(err){
     alert("Erreur : "+err.message);

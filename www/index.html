@@ -891,13 +891,15 @@ async function calculateShipping(method){
  let quantity=0;
 
  if(method==="maritime"){
-  const missing=cart.filter(x=>!Number.isFinite(Number(x.volume_m3))||Number(x.volume_m3)<=0);
-  if(missing.length)throw new Error("Volume manquant pour : "+missing.map(x=>x.name).join(", ")+". Complétez les volumes dans l'espace administrateur.");
-  quantity=cart.reduce((sum,x)=>sum+Number(x.volume_m3)*x.quantity,0);
+  quantity=cart.reduce((sum,x)=>{
+   const volume=Number(x.volume_m3);
+   return sum+(Number.isFinite(volume)&&volume>0?volume:0)*(Number(x.quantity)||0);
+  },0);
  }else{
-  const missing=cart.filter(x=>!Number.isFinite(Number(x.weight_kg))||Number(x.weight_kg)<=0);
-  if(missing.length)throw new Error("Poids manquant pour : "+missing.map(x=>x.name).join(", ")+". Complétez les poids dans l'espace administrateur.");
-  quantity=cart.reduce((sum,x)=>sum+Number(x.weight_kg)*x.quantity,0);
+  quantity=cart.reduce((sum,x)=>{
+   const weight=Number(x.weight_kg);
+   return sum+(Number.isFinite(weight)&&weight>0?weight:0)*(Number(x.quantity)||0);
+  },0);
  }
 
  const productTotal=cart.reduce((sum,x)=>sum+x.price*x.quantity,0);
